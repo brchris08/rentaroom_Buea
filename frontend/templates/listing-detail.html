@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Listing Detail — RentARoom Buea</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green: #1a6b3c; --green-light: #e8f5ee;
+      --yellow: #f5c518; --dark: #111;
+      --gray: #666; --card-border: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f9f9f6; color: var(--dark); }
+
+    nav {
+      background: var(--green); padding: 1rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: #fff; text-decoration: none; }
+    .nav-logo span { color: var(--yellow); }
+    .nav-toggle { display: none; background: none; border: none; color: #fff; font-size: 1.6rem; cursor: pointer; }
+    .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+    .nav-links a { color: #fff; text-decoration: none; margin-left: 1rem; font-size: 0.95rem; opacity: 0.85; transition: opacity 0.2s; }
+    .nav-links a:hover { opacity: 1; }
+    .btn-post { background: var(--yellow); color: var(--dark) !important; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 500; opacity: 1 !important; }
+
+    .page-wrap { max-width: 760px; margin: 2.5rem auto; padding: 0 1.5rem; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--green); text-decoration: none; font-size: 0.9rem; font-weight: 500; margin-bottom: 1.5rem; }
+    .back-link:hover { text-decoration: underline; }
+
+    .detail-card { background: #fff; border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.05); }
+
+    /* MAIN PHOTO */
+    .main-photo {
+      width: 100%; height: 300px; overflow: hidden;
+      background: var(--green-light);
+      display: flex; align-items: center; justify-content: center; font-size: 5rem;
+      position: relative;
+    }
+    .main-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* PHOTO STRIP */
+    .photo-strip {
+      display: flex; gap: 4px; padding: 4px;
+      background: #f0f0f0; overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    .photo-strip::-webkit-scrollbar { height: 4px; }
+    .photo-strip::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+    .photo-thumb {
+      flex-shrink: 0; width: 80px; height: 60px;
+      object-fit: cover; cursor: pointer; border-radius: 4px;
+      border: 2px solid transparent; transition: border-color 0.2s;
+    }
+    .photo-thumb.active { border-color: var(--green); }
+
+    .detail-body { padding: 2rem; }
+    .detail-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem; }
+    .detail-neighborhood { font-size: 0.8rem; color: var(--green); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .detail-title { font-family: 'Syne', sans-serif; font-size: 1.7rem; font-weight: 800; line-height: 1.2; }
+    .detail-type { color: var(--gray); font-size: 0.95rem; margin-top: 0.3rem; }
+
+    .price-block { text-align: right; flex-shrink: 0; }
+    .price-block .amount { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+    .price-block .per-year { font-size: 0.8rem; color: var(--gray); display: block; }
+
+    .fairness-badge { display: inline-block; font-size: 0.82rem; padding: 0.3rem 0.9rem; border-radius: 20px; font-weight: 600; margin-top: 0.4rem; }
+    .badge-fair { background: #d4edda; color: #155724; }
+    .badge-good { background: #cce5ff; color: #004085; }
+    .badge-overpriced { background: #f8d7da; color: #721c24; }
+
+    .divider { border: none; border-top: 1px solid var(--card-border); margin: 1.5rem 0; }
+    .section-title { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin-bottom: 1rem; }
+
+    .amenities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1.5rem; }
+    .amenity-item { background: var(--green-light); border-radius: 10px; padding: 0.8rem 1rem; text-align: center; font-size: 0.88rem; font-weight: 500; }
+    .amenity-item .icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+    .amenity-item.unavailable { background: #f5f5f5; color: var(--gray); text-decoration: line-through; opacity: 0.5; }
+
+    .description-text { color: var(--gray); line-height: 1.7; font-size: 0.95rem; }
+
+    .ai-box { background: var(--green-light); border: 1px solid #b8ddc8; border-radius: 12px; padding: 1.2rem 1.5rem; margin-top: 1.5rem; }
+    .ai-box .ai-title { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--green); margin-bottom: 0.5rem; }
+    .ai-box .ai-predicted { font-size: 1rem; font-weight: 600; }
+    .ai-box .ai-advice { font-size: 0.85rem; color: var(--gray); margin-top: 0.3rem; }
+
+    .contact-box { background: var(--dark); color: #fff; border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; text-align: center; }
+    .contact-box p { font-size: 0.9rem; opacity: 0.7; margin-bottom: 0.8rem; }
+    .btn-contact { background: var(--yellow); color: var(--dark); border: none; border-radius: 8px; padding: 0.7rem 2rem; font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+
+    .loading { text-align: center; padding: 4rem; color: var(--gray); }
+    footer { text-align: center; padding: 2rem; color: var(--gray); font-size: 0.85rem; margin-top: 3rem; }
+
+    @media (max-width: 768px) {
+      .nav-toggle { display: block; }
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0; background: var(--green); padding: 1rem 2rem; gap: 0.8rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a { margin-left: 0; font-size: 1rem; }
+      .main-photo { height: 220px; }
+      .detail-top { flex-direction: column; }
+      .price-block { text-align: left; }
+      .detail-title { font-size: 1.4rem; }
+      .amenities-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 480px) {
+      nav { padding: 0.8rem 1rem; }
+      .page-wrap { padding: 0 1rem; }
+      .detail-body { padding: 1.2rem; }
+      .main-photo { height: 180px; }
+      .amenities-grid { gap: 0.5rem; }
+      .amenity-item { padding: 0.6rem 0.4rem; font-size: 0.78rem; }
+      .price-block .amount { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/home" class="nav-logo">Rent<span>A</span>Room <span style="color:#fff;font-weight:300;font-size:1rem;">Buea</span></a>
+  <button class="nav-toggle" onclick="toggleNav()">☰</button>
+  <div class="nav-links" id="nav-links">
+    <a href="/home">Browse</a>
+    <a href="/post-listing" class="btn-post" id="btn-post-listing">+ Post a Room</a>
+    <a href="#" id="nav-auth-link">Login</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <a href="/home" class="back-link">← Back to listings</a>
+  <div id="detail-content">
+    <div class="loading">Loading listing...</div>
+  </div>
+</div>
+
+<footer>RentARoom Buea &copy; 2025 — Built by Bake Brian-Chris Nkongho</footer>
+
+<script>
+  const API = "http://127.0.0.1:8000";
+  const params = new URLSearchParams(window.location.search);
+  const listingId = params.get("id");
+
+  function toggleNav() {
+    document.getElementById("nav-links").classList.toggle("open");
+  }
+
+  // Auth state
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const authLink = document.getElementById("nav-auth-link");
+  if (user) {
+    authLink.textContent = `Logout (${user.full_name.split(" ")[0]})`;
+    authLink.onclick = () => { localStorage.removeItem("user"); window.location.href = "/login"; };
+  } else {
+    authLink.textContent = "Login";
+    authLink.href = "/login";
+  }
+
+  if (user.role === "student") {
+  const postBtn = document.getElementById("btn-post-listing");
+  if (postBtn) postBtn.style.display = "none";
+}
+
+  function getRoomEmoji(type) {
+    if (type === "Single Room") return "🛏️";
+    if (type === "Room and Toilet") return "🚿";
+    return "🏠";
+  }
+
+  function getFairnessClass(label) {
+    if (label === "Good Deal") return "badge-good";
+    if (label === "Overpriced") return "badge-overpriced";
+    return "badge-fair";
+  }
+
+  function getFairnessAdvice(label) {
+    if (label === "Good Deal") return "This room is priced below market — excellent value for students!";
+    if (label === "Overpriced") return "This room is priced above the estimated fair value for its features.";
+    return "This room is priced fairly for its type and amenities.";
+  }
+
+  function switchPhoto(url, thumbEl) {
+    document.getElementById("main-photo-img").src = url;
+    document.querySelectorAll(".photo-thumb").forEach(t => t.classList.remove("active"));
+    thumbEl.classList.add("active");
+  }
+
+  async function loadListing() {
+    if (!listingId) {
+      document.getElementById("detail-content").innerHTML = `<p style="color:red;padding:2rem">No listing ID provided.</p>`;
+      return;
+    }
+    try {
+      const res = await fetch(`${API}/listings/${listingId}`);
+      const listing = await res.json();
+
+      if (!listing || listing.detail) {
+        document.getElementById("detail-content").innerHTML = `<p style="color:red;padding:2rem">Listing not found.</p>`;
+        return;
+      }
+
+      // Get AI prediction
+      let predicted = null;
+      let label = "Fair";
+      try {
+        const predRes = await fetch(`${API}/predict/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            neighborhood: listing.neighborhood,
+            room_type: listing.room_type,
+            water: listing.water ? 1 : 0,
+            electricity: listing.electricity ? 1 : 0,
+            wifi: listing.wifi ? 1 : 0,
+            actual_price: listing.price
+          })
+        });
+        const predData = await predRes.json();
+        predicted = predData.predicted_price;
+        label = predData.fairness_label;
+      } catch (e) {}
+
+      const badgeClass = getFairnessClass(label);
+      const emoji = getRoomEmoji(listing.room_type);
+      const images = listing.images || [];
+
+      // Main photo
+      const mainPhotoContent = images.length > 0
+        ? `<img id="main-photo-img" src="${images[0].image_url}" alt="Main photo"/>`
+        : `<span id="main-photo-img">${emoji}</span>`;
+
+      // Thumbnail strip
+      const thumbStrip = images.length > 1
+        ? `<div class="photo-strip">
+            ${images.map((img, i) => `
+              <img class="photo-thumb ${i === 0 ? 'active' : ''}"
+                src="${img.image_url}"
+                alt="Photo ${i+1}"
+                onclick="switchPhoto('${img.image_url}', this)"
+              />
+            `).join("")}
+          </div>`
+        : "";
+
+      document.getElementById("detail-content").innerHTML = `
+        <div class="detail-card">
+          <div class="main-photo">${mainPhotoContent}</div>
+          ${thumbStrip}
+
+          <div class="detail-body">
+            <div class="detail-top">
+              <div>
+                <div class="detail-neighborhood">${listing.neighborhood}</div>
+                <div class="detail-title">${listing.title}</div>
+                <div class="detail-type">${listing.room_type}</div>
+              </div>
+              <div class="price-block">
+                <div class="amount">${Number(listing.price).toLocaleString()}</div>
+                <span class="per-year">FCFA / year</span>
+                <div><span class="fairness-badge ${badgeClass}">${label}</span></div>
+              </div>
+            </div>
+
+            <hr class="divider"/>
+
+            <div class="section-title">Amenities</div>
+            <div class="amenities-grid">
+              <div class="amenity-item ${!listing.water ? 'unavailable' : ''}">
+                <span class="icon">💧</span>Water
+              </div>
+              <div class="amenity-item ${!listing.electricity ? 'unavailable' : ''}">
+                <span class="icon">⚡</span>Stable Electricity
+              </div>
+              <div class="amenity-item ${!listing.wifi ? 'unavailable' : ''}">
+                <span class="icon">📶</span>WiFi
+              </div>
+            </div>
+
+            ${listing.description ? `
+              <hr class="divider"/>
+              <div class="section-title">Description</div>
+              <p class="description-text">${listing.description}</p>
+            ` : ""}
+
+            <div class="ai-box">
+              <div class="ai-title">🤖 AI Price Analysis</div>
+              <div class="ai-predicted">
+                Estimated fair price: ${predicted ? Number(predicted).toLocaleString() + " FCFA/yr" : "N/A"}
+                <span class="fairness-badge ${badgeClass}">${label}</span>
+              </div>
+              <div class="ai-advice">${getFairnessAdvice(label)}</div>
+            </div>
+
+            <div class="contact-box">
+              <p>Interested in this room? Contact the landlord directly.</p>
+              <button class="btn-contact" onclick="alert('Contact feature coming soon!')">Contact Landlord</button>
+            </div>
+          </div>
+        </div>`;
+
+    } catch (err) {
+      document.getElementById("detail-content").innerHTML = `<p style="color:red;padding:2rem">Could not load listing.</p>`;
+    }
+  }
+
+  loadListing();
+</script>
+</body>
+</html>

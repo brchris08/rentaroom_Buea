@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Post a Room — RentARoom Buea</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green: #1a6b3c; --green-light: #e8f5ee;
+      --yellow: #f5c518; --dark: #111;
+      --gray: #666; --card-border: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f9f9f6; color: var(--dark); }
+
+    nav {
+      background: var(--green); padding: 1rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: #fff; text-decoration: none; }
+    .nav-logo span { color: var(--yellow); }
+    .nav-toggle { display: none; background: none; border: none; color: #fff; font-size: 1.6rem; cursor: pointer; }
+    .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+    .nav-links a { color: #fff; text-decoration: none; margin-left: 1rem; font-size: 0.95rem; opacity: 0.85; transition: opacity 0.2s; }
+    .nav-links a:hover { opacity: 1; }
+
+    .page-wrap { max-width: 640px; margin: 2.5rem auto; padding: 0 1.5rem; }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 0.3rem; }
+    .page-subtitle { color: var(--gray); font-size: 0.95rem; margin-bottom: 2rem; }
+
+    .form-card { background: #fff; border: 1px solid var(--card-border); border-radius: 16px; padding: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.05); }
+    .section-label { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin: 1.5rem 0 0.8rem; }
+    .section-label:first-child { margin-top: 0; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; border: 1px solid var(--card-border); border-radius: 8px;
+      padding: 0.6rem 0.9rem; font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; outline: none; transition: border-color 0.2s; background: #fafafa;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    /* MULTI UPLOAD */
+    .upload-area {
+      border: 2px dashed var(--card-border); border-radius: 10px;
+      padding: 1.5rem; text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s; background: #fafafa; position: relative;
+    }
+    .upload-area:hover { border-color: var(--green); background: var(--green-light); }
+    .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+    .upload-label { font-size: 0.88rem; color: var(--gray); }
+    .upload-label strong { color: var(--green); }
+
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.8rem; margin-top: 1rem; }
+    .photo-item { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; background: #f0f0f0; }
+    .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-item .cover-badge {
+      position: absolute; top: 6px; left: 6px;
+      background: var(--yellow); color: var(--dark);
+      font-size: 0.65rem; font-weight: 700; padding: 2px 7px;
+      border-radius: 10px; text-transform: uppercase;
+    }
+    .photo-item .delete-btn {
+      position: absolute; top: 6px; right: 6px;
+      background: rgba(0,0,0,0.6); color: #fff;
+      border: none; border-radius: 50%; width: 26px; height: 26px;
+      font-size: 0.9rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .photo-item .delete-btn:hover { background: #c0392b; }
+    .photo-hint { font-size: 0.8rem; color: var(--gray); margin-top: 0.5rem; }
+
+    .checkbox-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .checkbox-item { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; }
+    .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+
+    .btn-submit {
+      width: 100%; background: var(--green); color: #fff;
+      border: none; border-radius: 8px; padding: 0.85rem;
+      font-family: 'Syne', sans-serif; font-size: 1rem;
+      font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #145230; }
+    .btn-submit:disabled { background: #999; cursor: not-allowed; }
+
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.88rem; margin-bottom: 1rem; display: none; }
+    .alert-error { background: #f8d7da; color: #721c24; }
+    .alert-success { background: #d4edda; color: #155724; }
+
+    footer { text-align: center; padding: 2rem; color: var(--gray); font-size: 0.85rem; margin-top: 3rem; }
+
+    @media (max-width: 768px) {
+      .nav-toggle { display: block; }
+      .nav-links {
+        display: none; flex-direction: column;
+        position: absolute; top: 60px; left: 0; right: 0;
+        background: var(--green); padding: 1rem 2rem; gap: 0.8rem; z-index: 99;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { margin-left: 0; font-size: 1rem; }
+      .checkbox-row { flex-direction: column; gap: 0.8rem; }
+      .photo-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+    }
+    @media (max-width: 480px) {
+      nav { padding: 0.8rem 1rem; }
+      .page-wrap { padding: 0 1rem; }
+      .form-card { padding: 1.2rem; }
+      .page-title { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/home" class="nav-logo">Rent<span>A</span>Room <span style="color:#fff;font-weight:300;font-size:1rem;">Buea</span></a>
+  <button class="nav-toggle" onclick="toggleNav()">☰</button>
+  <div class="nav-links" id="nav-links">
+    <a href="/home">Browse</a>
+    <a href="#" id="nav-auth-link">Login</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-title">Post a Room</div>
+  <div class="page-subtitle">Fill in the details below to list your room for students</div>
+
+  <div class="form-card">
+    <div class="alert" id="alert"></div>
+
+    <div class="section-label">Room Details</div>
+
+    <div class="form-group">
+      <label>Listing Title</label>
+      <input type="text" id="title" placeholder="e.g. Clean self-contain near UB gate"/>
+    </div>
+
+    <div class="form-group">
+      <label>Neighbourhood</label>
+      <select id="neighborhood">
+        <option value="">Select neighbourhood</option>
+        <option value="Molyko">Molyko</option>
+        <option value="Bonduma">Bonduma</option>
+        <option value="Great Soppo">Great Soppo</option>
+        <option value="Clerks Quarter">Clerks Quarter</option>
+        <option value="Mile 16">Mile 16</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Room Type</label>
+      <select id="room_type">
+        <option value="">Select room type</option>
+        <option value="Single Room">Single Room</option>
+        <option value="Room and Toilet">Room and Toilet</option>
+        <option value="Self Contain">Self Contain</option>
+      </select>
+    </div>
+
+    <div class="section-label">Photos</div>
+    <p class="photo-hint" style="margin-bottom:0.8rem;">Upload as many photos as you want. The first photo will be the cover shown on the browse page.</p>
+
+    <div class="upload-area" id="upload-area">
+      <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotoUpload(event)"/>
+      <div class="upload-icon">📷</div>
+      <div class="upload-label"><strong>Click to upload</strong> or drag and drop<br/>JPG, PNG, WEBP — multiple allowed</div>
+    </div>
+
+    <div class="photo-grid" id="photo-grid"></div>
+    <p class="photo-hint" id="photo-count-hint"></p>
+
+    <div class="section-label">Amenities</div>
+    <div class="checkbox-row">
+      <label class="checkbox-item"><input type="checkbox" id="water"/> 💧 Water Supply</label>
+      <label class="checkbox-item"><input type="checkbox" id="electricity"/> ⚡ Stable Electricity</label>
+      <label class="checkbox-item"><input type="checkbox" id="wifi"/> 📶 WiFi</label>
+    </div>
+
+    <div class="section-label">Pricing</div>
+    <div class="form-group">
+      <label>Yearly Rent (FCFA)</label>
+      <input type="number" id="price" placeholder="e.g. 450000"/>
+    </div>
+
+    <div class="form-group">
+      <label>Description <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+      <textarea id="description" placeholder="Any extra details about the room..."></textarea>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitListing()">Post Listing</button>
+  </div>
+</div>
+
+<footer>RentARoom Buea &copy; 2025 — Built by Bake Brian-Chris Nkongho</footer>
+
+<script>
+  const API = "http://127.0.0.1:8000";
+  let uploadedImageUrls = [];
+
+  function toggleNav() {
+    document.getElementById("nav-links").classList.toggle("open");
+  }
+
+  // Auth state
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+if (!user) {
+  window.location.href = "/login";
+} else if (user.role === "student") {
+  window.location.href = "/home";
+}
+
+  function showAlert(msg, type) {
+    const el = document.getElementById("alert");
+    el.textContent = msg;
+    el.className = `alert alert-${type}`;
+    el.style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function updatePhotoGrid() {
+    const grid = document.getElementById("photo-grid");
+    const hint = document.getElementById("photo-count-hint");
+    if (uploadedImageUrls.length === 0) {
+      grid.innerHTML = "";
+      hint.textContent = "";
+      return;
+    }
+    hint.textContent = `${uploadedImageUrls.length} photo${uploadedImageUrls.length > 1 ? "s" : ""} uploaded. First photo is the cover.`;
+    grid.innerHTML = uploadedImageUrls.map((url, i) => `
+      <div class="photo-item" id="photo-${i}">
+        <img src="${url}" alt="Photo ${i + 1}"/>
+        ${i === 0 ? '<span class="cover-badge">Cover</span>' : ""}
+        <button class="delete-btn" onclick="deletePhoto(${i})">✕</button>
+      </div>
+    `).join("");
+  }
+
+  function deletePhoto(index) {
+    uploadedImageUrls.splice(index, 1);
+    updatePhotoGrid();
+  }
+
+  async function handlePhotoUpload(event) {
+    const files = Array.from(event.target.files);
+    if (!files.length) return;
+
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        const res = await fetch(`${API}/upload-image`, { method: "POST", body: formData });
+        const data = await res.json();
+        uploadedImageUrls.push(data.image_url);
+      } catch (err) {
+        showAlert("One or more photos failed to upload.", "error");
+      }
+    }
+    updatePhotoGrid();
+    // Reset input so same files can be re-uploaded if needed
+    event.target.value = "";
+  }
+
+  async function submitListing() {
+    const title = document.getElementById("title").value.trim();
+    const neighborhood = document.getElementById("neighborhood").value;
+    const room_type = document.getElementById("room_type").value;
+    const water = document.getElementById("water").checked;
+    const electricity = document.getElementById("electricity").checked;
+    const wifi = document.getElementById("wifi").checked;
+    const price = Number(document.getElementById("price").value);
+    const description = document.getElementById("description").value.trim();
+
+    if (!title || !neighborhood || !room_type || !price) {
+      return showAlert("Please fill in all required fields.", "error");
+    }
+
+    const btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    btn.textContent = "Posting...";
+
+    const res = await fetch(`${API}/listings/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title, neighborhood, room_type,
+        water, electricity, wifi, price, description,
+        owner_id: user.user_id,
+        image_urls: uploadedImageUrls
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      showAlert("Listing posted successfully! Redirecting...", "success");
+      setTimeout(() => window.location.href = "/home", 1500);
+    } else {
+      showAlert(data.detail || "Failed to post listing.", "error");
+      btn.disabled = false;
+      btn.textContent = "Post Listing";
+    }
+  }
+</script>
+</body>
+</html>

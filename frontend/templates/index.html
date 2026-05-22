@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RentARoom Buea</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green: #1a6b3c;
+      --green-light: #e8f5ee;
+      --yellow: #f5c518;
+      --dark: #111;
+      --gray: #666;
+      --card-border: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f9f9f6; color: var(--dark); }
+
+    /* NAV */
+    nav {
+      background: var(--green);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.4rem;
+      color: #fff; text-decoration: none;
+    }
+    .nav-logo span { color: var(--yellow); }
+    .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+    .nav-links a {
+      color: #fff; text-decoration: none;
+      margin-left: 1rem; font-size: 0.95rem; opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+    .nav-links .btn-post {
+      background: var(--yellow); color: var(--dark);
+      padding: 0.4rem 1rem; border-radius: 20px;
+      font-weight: 500; opacity: 1;
+    }
+    .nav-toggle {
+      display: none;
+      background: none; border: none;
+      color: #fff; font-size: 1.6rem; cursor: pointer;
+    }
+
+    /* HERO */
+    .hero {
+      background: var(--green);
+      color: #fff;
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.8rem; font-weight: 800; line-height: 1.2;
+    }
+    .hero h1 span { color: var(--yellow); }
+    .hero p { margin-top: 0.8rem; font-size: 1.05rem; opacity: 0.85; }
+
+    /* FILTERS */
+    .filters {
+      background: #fff;
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 2rem;
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filters select,
+    .filters input[type="number"],
+    .filters input[type="text"] {
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.45rem 0.8rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      background: #fafafa;
+      outline: none;
+      flex: 1;
+      min-width: 140px;
+    }
+    .filters select:focus,
+    .filters input:focus { border-color: var(--green); }
+    .btn-filter {
+      background: var(--green); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 0.45rem 1.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; cursor: pointer;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .btn-filter:hover { background: #145230; }
+    .btn-clear {
+      background: #666; color: #fff;
+      border: none; border-radius: 8px;
+      padding: 0.45rem 1.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* LISTINGS */
+    .listings-section {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .listings-count {
+      font-size: 0.9rem; color: var(--gray); margin-bottom: 1rem;
+    }
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* CARD */
+    .card {
+      background: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .card-img {
+      width: 100%; height: 190px;
+      object-fit: cover;
+      background: var(--green-light);
+      display: flex; align-items: center;
+      justify-content: center; font-size: 3.5rem;
+    }
+    .card-img img {
+      width: 100%; height: 190px;
+      object-fit: cover; display: block;
+    }
+    .card-body { padding: 1rem 1.2rem 1.2rem; }
+    .card-neighborhood {
+      font-size: 0.78rem; color: var(--green);
+      font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700; margin: 0.3rem 0;
+    }
+    .card-type { font-size: 0.85rem; color: var(--gray); margin-bottom: 0.7rem; }
+    .amenities { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+    .amenity-tag {
+      background: var(--green-light); color: var(--green);
+      font-size: 0.75rem; padding: 0.2rem 0.6rem;
+      border-radius: 20px; font-weight: 500;
+    }
+    .card-footer-row {
+      display: flex; justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--card-border);
+      padding-top: 0.8rem; margin-top: 0.5rem;
+    }
+    .card-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+    }
+    .card-price span { font-size: 0.75rem; color: var(--gray); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+    .fairness-badge {
+      font-size: 0.75rem; padding: 0.25rem 0.7rem;
+      border-radius: 20px; font-weight: 600;
+    }
+    .badge-fair { background: #d4edda; color: #155724; }
+    .badge-good { background: #cce5ff; color: #004085; }
+    .badge-overpriced { background: #f8d7da; color: #721c24; }
+
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--gray); }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+    .loading { text-align: center; padding: 3rem; color: var(--gray); }
+
+    footer {
+      text-align: center; padding: 2rem;
+      color: var(--gray); font-size: 0.85rem;
+      border-top: 1px solid var(--card-border); margin-top: 3rem;
+    }
+
+    /* MOBILE FILTER BAR */
+.mobile-filter-bar {
+  display: none;
+  padding: 0.8rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid var(--card-border);
+  align-items: center;
+  gap: 0.8rem;
+}
+.btn-mobile-filter {
+  flex: 1;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  padding: 0.7rem 1.5rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-mobile-filter:hover { background: #145230; }
+.mobile-filter-count {
+  font-size: 0.8rem;
+  color: var(--green);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* FILTER OVERLAY */
+.filter-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+.filter-overlay.open { display: block; }
+
+/* FILTER DRAWER */
+.filter-drawer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  z-index: 201;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.filter-drawer.open { transform: translateY(0); }
+
+.drawer-handle {
+  width: 40px; height: 4px;
+  background: #ddd; border-radius: 2px;
+  margin: 0.8rem auto 0;
+}
+.drawer-header {
+  display: flex; justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.drawer-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem; font-weight: 700;
+}
+.drawer-close {
+  background: #f0f0f0; border: none;
+  border-radius: 50%; width: 30px; height: 30px;
+  cursor: pointer; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.drawer-body { padding: 1.2rem 1.5rem; }
+.drawer-group { margin-bottom: 1.2rem; }
+.drawer-group label {
+  display: block; font-size: 0.82rem;
+  font-weight: 600; margin-bottom: 0.4rem;
+  color: #444;
+}
+.drawer-group input,
+.drawer-group select {
+  width: 100%;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  background: #fafafa;
+}
+.drawer-group input:focus,
+.drawer-group select:focus { border-color: var(--green); }
+
+.drawer-footer {
+  display: flex; gap: 0.8rem;
+  padding: 1rem 1.5rem 2rem;
+  border-top: 1px solid var(--card-border);
+}
+.btn-drawer-clear {
+  flex: 1; background: #f0f0f0;
+  border: none; border-radius: 10px;
+  padding: 0.8rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem; cursor: pointer;
+}
+.btn-drawer-apply {
+  flex: 2; background: var(--green);
+  color: #fff; border: none; border-radius: 10px;
+  padding: 0.8rem; font-family: 'Syne', sans-serif;
+  font-size: 0.95rem; font-weight: 700; cursor: pointer;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* SHOW/HIDE based on screen size */
+@media (max-width: 768px) {
+  #desktop-filters { display: none !important; }
+  .mobile-filter-bar { display: flex; }
+}
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.9rem; }
+      .nav-toggle { display: block; }
+      .nav-links {
+        display: none; flex-direction: column;
+        position: absolute; top: 60px; left: 0; right: 0;
+        background: var(--green); padding: 1rem 2rem;
+        gap: 0.8rem; z-index: 99;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { margin-left: 0; font-size: 1rem; }
+      .filters { flex-direction: column; }
+      .filters select,
+      .filters input { width: 100%; min-width: unset; }
+      .btn-filter, .btn-clear { width: 100%; text-align: center; }
+      .listings-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      nav { padding: 0.8rem 1rem; }
+      .hero { padding: 2.5rem 1rem 2rem; }
+      .hero h1 { font-size: 1.6rem; }
+      .listings-section { padding: 0 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Rent<span>A</span>Room <span style="color:#fff;font-weight:300;font-size:1rem;">Buea</span></a>
+  <button class="nav-toggle" onclick="toggleNav()">☰</button>
+  <div class="nav-links" id="nav-links">
+    <a href="/home">Browse</a>
+    <a href="/post-listing" class="btn-post" id="btn-post-listing">+ Post a Room</a>
+    <a href="/login" id="nav-auth-link">Login</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Find Your Perfect Room<br/>in <span>Buea</span></h1>
+  <p>Browse verified listings with AI-powered fair price indicators</p>
+</div>
+
+<!-- DESKTOP FILTERS -->
+<div class="filters" id="desktop-filters">
+  <input type="text" id="search-neighborhood" placeholder="Search neighbourhood..." oninput="applyFilters()"/>
+  <select id="filter-neighborhood" onchange="applyFilters()">
+    <option value="">All Neighbourhoods</option>
+    <option value="Molyko">Molyko</option>
+    <option value="Bonduma">Bonduma</option>
+    <option value="Great Soppo">Great Soppo</option>
+    <option value="Clerks Quarter">Clerks Quarter</option>
+    <option value="Mile 16">Mile 16</option>
+  </select>
+  <select id="filter-room-type" onchange="applyFilters()">
+    <option value="">All Room Types</option>
+    <option value="Single Room">Single Room</option>
+    <option value="Room and Toilet">Room and Toilet</option>
+    <option value="Self Contain">Self Contain</option>
+  </select>
+  <input type="number" id="filter-max-price" placeholder="Max price (FCFA/yr)" oninput="applyFilters()"/>
+  <button class="btn-clear" onclick="clearFilters()">Clear</button>
+</div>
+
+<!-- MOBILE FILTER BUTTON -->
+<div class="mobile-filter-bar" id="mobile-filter-bar">
+  <button class="btn-mobile-filter" id="btn-mobile-filter">🔍 Filter Rooms</button>
+  <span class="mobile-filter-count" id="mobile-filter-count"></span>
+</div>
+
+<!-- OVERLAY -->
+<div class="filter-overlay" id="filter-overlay"></div>
+
+<!-- MOBILE FILTER DRAWER -->
+<div class="filter-drawer" id="filter-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <span class="drawer-title">Filter Rooms</span>
+    <button class="drawer-close" id="drawer-close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-group">
+      <label>Search Neighbourhood</label>
+      <input type="text" id="m-search-neighborhood" placeholder="e.g. Molyko..." oninput="syncAndFilter()"/>
+    </div>
+    <div class="drawer-group">
+      <label>Neighbourhood</label>
+      <select id="m-filter-neighborhood" onchange="syncAndFilter()">
+        <option value="">All Neighbourhoods</option>
+        <option value="Molyko">Molyko</option>
+        <option value="Bonduma">Bonduma</option>
+        <option value="Great Soppo">Great Soppo</option>
+        <option value="Clerks Quarter">Clerks Quarter</option>
+        <option value="Mile 16">Mile 16</option>
+      </select>
+    </div>
+    <div class="drawer-group">
+      <label>Room Type</label>
+      <select id="m-filter-room-type" onchange="syncAndFilter()">
+        <option value="">All Room Types</option>
+        <option value="Single Room">Single Room</option>
+        <option value="Room and Toilet">Room and Toilet</option>
+        <option value="Self Contain">Self Contain</option>
+      </select>
+    </div>
+    <div class="drawer-group">
+      <label>Max Price (FCFA/year)</label>
+      <input type="number" id="m-filter-max-price" placeholder="e.g. 400000" oninput="syncAndFilter()"/>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn-drawer-clear" onclick="clearFilters()">Clear All</button>
+    <button class="btn-drawer-apply" id="btn-drawer-apply">Show Results</button>
+  </div>
+</div>
+
+<div class="listings-section">
+  <div class="listings-count" id="listings-count"></div>
+  <div class="listings-grid" id="listings-grid">
+    <div class="loading">Loading listings...</div>
+  </div>
+</div>
+
+<footer>RentARoom Buea &copy; 2025 &mdash; Built by Bake Brian-Chris Nkongho</footer>
+
+<script>
+const API = "http://127.0.0.1:8000";
+let allListings = [];
+
+// Filter drawer
+function openFilterDrawer() {
+  document.getElementById("filter-drawer").classList.add("open");
+  document.getElementById("filter-overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeFilterDrawer() {
+  document.getElementById("filter-drawer").classList.remove("open");
+  document.getElementById("filter-overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("btn-mobile-filter").addEventListener("click", openFilterDrawer);
+  document.getElementById("drawer-close").addEventListener("click", closeFilterDrawer);
+  document.getElementById("filter-overlay").addEventListener("click", closeFilterDrawer);
+  document.getElementById("btn-drawer-apply").addEventListener("click", closeFilterDrawer);
+});
+
+function toggleNav() {
+  document.getElementById("nav-links").classList.toggle("open");
+}
+
+function syncAndFilter() {
+  document.getElementById("search-neighborhood").value = document.getElementById("m-search-neighborhood").value;
+  document.getElementById("filter-neighborhood").value = document.getElementById("m-filter-neighborhood").value;
+  document.getElementById("filter-room-type").value = document.getElementById("m-filter-room-type").value;
+  document.getElementById("filter-max-price").value = document.getElementById("m-filter-max-price").value;
+  applyFilters();
+  updateMobileFilterCount();
+}
+
+function updateMobileFilterCount() {
+  const count = [
+    document.getElementById("m-search-neighborhood").value,
+    document.getElementById("m-filter-neighborhood").value,
+    document.getElementById("m-filter-room-type").value,
+    document.getElementById("m-filter-max-price").value
+  ].filter(Boolean).length;
+  document.getElementById("mobile-filter-count").textContent = count > 0 ? `${count} filter${count > 1 ? "s" : ""} active` : "";
+}
+
+function clearFilters() {
+  ["search-neighborhood","filter-neighborhood","filter-room-type","filter-max-price",
+   "m-search-neighborhood","m-filter-neighborhood","m-filter-room-type","m-filter-max-price"]
+  .forEach(id => document.getElementById(id).value = "");
+  document.getElementById("mobile-filter-count").textContent = "";
+  renderListings(allListings);
+}
+
+async function loadListings() {
+  try {
+    const res = await fetch(`${API}/listings/`);
+    allListings = await res.json();
+    await Promise.all(allListings.map(async (listing) => {
+      try {
+        const predRes = await fetch(`${API}/predict/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            neighborhood: listing.neighborhood,
+            room_type: listing.room_type,
+            water: listing.water ? 1 : 0,
+            electricity: listing.electricity ? 1 : 0,
+            wifi: listing.wifi ? 1 : 0,
+            actual_price: listing.price
+          })
+        });
+        const predData = await predRes.json();
+        listing.label = predData.fairness_label;
+      } catch (e) { listing.label = "Fair"; }
+    }));
+    renderListings(allListings);
+  } catch (err) {
+    document.getElementById("listings-grid").innerHTML = `
+      <div class="empty-state"><div class="icon">⚠️</div>
+      <p>Could not connect to server.</p></div>`;
+  }
+}
+
+function getFairnessClass(label) {
+  if (label === "Good Deal") return "badge-good";
+  if (label === "Overpriced") return "badge-overpriced";
+  return "badge-fair";
+}
+
+function getRoomEmoji(type) {
+  if (type === "Single Room") return "🛏️";
+  if (type === "Room and Toilet") return "🚿";
+  return "🏠";
+}
+
+function renderListings(listings) {
+  const grid = document.getElementById("listings-grid");
+  const count = document.getElementById("listings-count");
+  if (listings.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🏠</div><p>No listings found.</p></div>`;
+    count.textContent = "";
+    return;
+  }
+  count.textContent = `${listings.length} listing${listings.length > 1 ? "s" : ""} found`;
+  grid.innerHTML = listings.map(l => {
+    const amenities = [
+      l.water ? "💧 Water" : "",
+      l.electricity ? "⚡ Electricity" : "",
+      l.wifi ? "📶 WiFi" : ""
+    ].filter(Boolean);
+    const badgeClass = getFairnessClass(l.label);
+    const label = l.label || "Fair";
+    const imgContent = l.image_url
+      ? `<img src="${l.image_url}" alt="${l.title}" loading="lazy"/>`
+      : `<div style="font-size:3.5rem">${getRoomEmoji(l.room_type)}</div>`;
+    return `
+      <a class="card" href="/listing-detail?id=${l.id}">
+        <div class="card-img">${imgContent}</div>
+        <div class="card-body">
+          <div class="card-neighborhood">${l.neighborhood}</div>
+          <div class="card-title">${l.title}</div>
+          <div class="card-type">${l.room_type}</div>
+          <div class="amenities">
+            ${amenities.map(a => `<span class="amenity-tag">${a}</span>`).join("")}
+          </div>
+          <div class="card-footer-row">
+            <div class="card-price">${Number(l.price).toLocaleString()} FCFA <span>/year</span></div>
+            <span class="fairness-badge ${badgeClass}">${label}</span>
+          </div>
+        </div>
+      </a>`;
+  }).join("");
+}
+
+function applyFilters() {
+  const search = document.getElementById("search-neighborhood").value.toLowerCase();
+  const neighborhood = document.getElementById("filter-neighborhood").value;
+  const roomType = document.getElementById("filter-room-type").value;
+  const maxPrice = document.getElementById("filter-max-price").value;
+  let filtered = allListings;
+  if (search) filtered = filtered.filter(l => l.neighborhood.toLowerCase().includes(search));
+  if (neighborhood) filtered = filtered.filter(l => l.neighborhood === neighborhood);
+  if (roomType) filtered = filtered.filter(l => l.room_type === roomType);
+  if (maxPrice) filtered = filtered.filter(l => l.price <= Number(maxPrice));
+  renderListings(filtered);
+}
+
+// Auth
+const user = JSON.parse(localStorage.getItem("user") || "null");
+if (user) {
+  document.getElementById("nav-auth-link").textContent = `Logout (${user.full_name.split(" ")[0]})`;
+  document.getElementById("nav-auth-link").href = "#";
+  document.getElementById("nav-auth-link").onclick = () => {
+    localStorage.removeItem("user");
+    location.reload();
+  };
+  if (user.role === "student") {
+    const postBtn = document.getElementById("btn-post-listing");
+    if (postBtn) postBtn.style.display = "none";
+  }
+}
+
+loadListings();
+</script>
+</body>
+</html>

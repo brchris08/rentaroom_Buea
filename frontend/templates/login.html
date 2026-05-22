@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — RentARoom Buea</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green: #1a6b3c;
+      --green-light: #e8f5ee;
+      --yellow: #f5c518;
+      --dark: #111;
+      --gray: #666;
+      --card-border: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f9f9f6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    nav {
+      background: var(--green);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: #fff;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--yellow); }
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-size: 0.95rem;
+      opacity: 0.85;
+    }
+    .page-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .auth-box {
+      background: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .auth-box h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.3rem;
+    }
+    .auth-box p {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 1.8rem;
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--card-border);
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.6rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--gray);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--dark);
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--green);
+    }
+    .btn-submit {
+      width: 100%;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #145230; }
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .alert-error { background: #f8d7da; color: #721c24; }
+    .alert-success { background: #d4edda; color: #155724; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/home" class="nav-logo">Rent<span>A</span>Room <span style="color:#fff;font-weight:300;font-size:1rem;">Buea</span></a>
+  <div class="nav-links">
+    <a href="/home">Browse Listings</a>
+  </div>
+</nav>
+
+<div class="page-center">
+  <div class="auth-box">
+    <h2>Welcome Back</h2>
+    <p>Login or create an account to continue</p>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab" onclick="switchTab('register')">Register</div>
+    </div>
+
+    <!-- ALERT -->
+    <div class="alert" id="alert"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="your@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••"/>
+      </div>
+      <button class="btn-submit" onclick="handleLogin()">Login</button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register-form" class="hidden">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="John Doe"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="your@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="••••••••"/>
+      </div>
+      <div class="form-group">
+        <label>I am a</label>
+        <select id="reg-role">
+          <option value="student">Student</option>
+          <option value="landlord">Landlord</option>
+        </select>
+      </div>
+      <button class="btn-submit" onclick="handleRegister()">Create Account</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:8000";
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+    hideAlert();
+  }
+
+  function showAlert(msg, type) {
+    const el = document.getElementById('alert');
+    el.textContent = msg;
+    el.className = `alert alert-${type}`;
+    el.style.display = 'block';
+  }
+
+  function hideAlert() {
+    document.getElementById('alert').style.display = 'none';
+  }
+
+  async function handleLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!email || !password) return showAlert('Please fill in all fields.', 'error');
+
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('user', JSON.stringify(data));
+      showAlert('Login successful! Redirecting...', 'success');
+      setTimeout(() => window.location.href = '/home', 1000);
+    } else {
+      showAlert(data.detail || 'Login failed.', 'error');
+    }
+  }
+
+  async function handleRegister() {
+    const full_name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const role = document.getElementById('reg-role').value;
+    if (!full_name || !email || !password) return showAlert('Please fill in all fields.', 'error');
+
+    const res = await fetch(`${API}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ full_name, email, password, role })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showAlert('Account created! Please login.', 'success');
+      setTimeout(() => switchTab('login'), 1500);
+    } else {
+      showAlert(data.detail || 'Registration failed.', 'error');
+    }
+  }
+</script>
+</body>
+</html>

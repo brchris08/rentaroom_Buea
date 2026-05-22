@@ -1,0 +1,11 @@
+fastapi #  web framework
+uvicorn # runs the FastAPI app
+sqlalchemy # helps Python talk to SQLite
+passlib[bcrypt] # encrypts passwords
+python-jose[cryptography] # handles login tokens
+python-multipart # handles form submissions
+scikit-learn # ML library
+pandas # handling CSV datase
+joblib # saves and loads ML model
+pytest # runs tests
+httpx # needed by pytest to test FastAPI
