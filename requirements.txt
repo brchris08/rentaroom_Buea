@@ -8,4 +8,5 @@ scikit-learn # ML library
 pandas # handling CSV datase
 joblib # saves and loads ML model
 pytest # runs tests
-httpx # needed by pytest to test FastAPI
+httpx # needed by pytest to test FastAPI 
+bcrypt==4.0.1

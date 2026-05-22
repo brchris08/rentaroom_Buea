@@ -18,9 +18,16 @@ def test_register():
 
 # Test 2 - Login
 def test_login():
+    email = f"login_{uuid.uuid4().hex[:8]}@gmail.com"
+    client.post("/auth/register", json={
+        "full_name": "Login User",
+        "email": email,
+        "password": "testpass123",
+        "role": "student"
+    })
     response = client.post("/auth/login", json={
-        "email": "bakechris3@gmail.com",
-        "password": "ppp111"
+        "email": email,
+        "password": "testpass123"
     })
     assert response.status_code == 200
     assert response.json()["message"] == "Login successful"
