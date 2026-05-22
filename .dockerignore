@@ -1,0 +1,9 @@
+room_env/
+__pycache__/
+*.pyc
+*.pyo
+.env
+rentaroom.db
+data/
+*.pkl
+.git
