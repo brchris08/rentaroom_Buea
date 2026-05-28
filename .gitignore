@@ -5,7 +5,10 @@ __pycache__/
 .env
 room_env/
 env/
-
+.env
+*.pyc
+.pytest_cache/
+frontend/static/uploads/
 # Database
 *.db
 *.sqlite3
