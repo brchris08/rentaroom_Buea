@@ -192,6 +192,11 @@
       <textarea id="description" placeholder="Any extra details about the room..."></textarea>
     </div>
 
+    <div class="form-group">
+      <label>WhatsApp Number <span style="color:var(--gray);font-weight:400">(for students to contact you)</span></label>
+      <input type="text" id="whatsapp_number" placeholder="e.g. 237612345678 (include country code)"/>
+    </div>
+
     <button class="btn-submit" id="submit-btn" onclick="submitListing()">Post Listing</button>
   </div>
 </div>
@@ -274,6 +279,7 @@ if (!user) {
     const wifi = document.getElementById("wifi").checked;
     const price = Number(document.getElementById("price").value);
     const description = document.getElementById("description").value.trim();
+    const whatsapp_number = document.getElementById("whatsapp_number").value.trim();
 
     if (!title || !neighborhood || !room_type || !price) {
       return showAlert("Please fill in all required fields.", "error");
@@ -290,7 +296,8 @@ if (!user) {
         title, neighborhood, room_type,
         water, electricity, wifi, price, description,
         owner_id: user.user_id,
-        image_urls: uploadedImageUrls
+        image_urls: uploadedImageUrls,
+        whatsapp_number: whatsapp_number || null
       })
     });
 

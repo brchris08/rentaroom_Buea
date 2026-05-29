@@ -1,13 +1,14 @@
 from dotenv import load_dotenv
 load_dotenv()
-from fastapi import FastAPI
+from fastapi import FastAPI,UploadFile, File, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from backend.database import engine, Base
+from backend.database import engine, Base, get_db
 from backend.routers import auth, listings, predict
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from fastapi import UploadFile, File
 import shutil, uuid, os
+from sqlalchemy.orm import Session
+from backend.models.schemas import User, Listing
 
 # Create all database tables
 Base.metadata.create_all(bind=engine)
@@ -28,6 +29,36 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.get("/admin")
+def serve_admin():
+    return FileResponse("frontend/templates/admin.html")
+
+@app.get("/admin/data")
+def get_admin_data(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    listings = db.query(Listing).all()
+    return {
+        "users": [{"id": u.id, "full_name": u.full_name, "email": u.email, "role": u.role} for u in users],
+        "listings": [{"id": l.id, "title": l.title, "neighborhood": l.neighborhood, "price": l.price, "owner_id": l.owner_id} for l in listings]
+    }
+
+@app.delete("/admin/users/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"message": "User deleted"}
+
+@app.delete("/admin/listings/{listing_id}")
+def delete_listing(listing_id: int, db: Session = Depends(get_db)):
+    listing = db.query(Listing).filter(Listing.id == listing_id).first()
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    db.delete(listing)
+    db.commit()
+    return {"message": "Listing deleted"}
 @app.get("/")
 def serve_welcome():
     return FileResponse("frontend/templates/welcome.html")

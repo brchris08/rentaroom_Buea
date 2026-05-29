@@ -6,6 +6,7 @@ from backend.database import Base
 class User(Base):
     __tablename__ = "users"
 
+    is_admin = Column(Boolean, default=False)
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
@@ -41,6 +42,7 @@ class ListingImage(Base):
     id = Column(Integer, primary_key=True, index=True)
     listing_id = Column(Integer, ForeignKey("listings.id"), nullable=False)
     image_url = Column(String, nullable=False)
+    whatsapp_number = Column(String, nullable=True)
     is_cover = Column(Boolean, default=False)
 
     listing = relationship("Listing", back_populates="images")

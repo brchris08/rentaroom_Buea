@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — RentARoom Buea</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green: #1a6b3c; --green-light: #e8f5ee;
+      --yellow: #f5c518; --dark: #111;
+      --gray: #666; --card-border: #e0e0e0;
+      --red: #dc3545;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f9f9f6; color: var(--dark); }
+    nav {
+      background: var(--dark); padding: 1rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 1.3rem; color: #fff; text-decoration: none;
+    }
+    .nav-logo span { color: var(--yellow); }
+    .nav-right { color: #fff; font-size: 0.9rem; opacity: 0.7; }
+    .page-wrap { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+    .page-title {
+      font-family: 'Syne', sans-serif; font-size: 1.8rem;
+      font-weight: 800; margin-bottom: 0.3rem;
+    }
+    .page-subtitle { color: var(--gray); font-size: 0.9rem; margin-bottom: 2rem; }
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem; margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #fff; border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 1.2rem 1.5rem;
+    }
+    .stat-card .label { font-size: 0.8rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-card .value { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-top: 0.3rem; }
+    .section-card {
+      background: #fff; border: 1px solid var(--card-border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 2rem;
+    }
+    .section-header {
+      padding: 1rem 1.5rem; border-bottom: 1px solid var(--card-border);
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 0.7rem 1.5rem;
+      font-size: 0.78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--gray); background: #fafafa;
+      border-bottom: 1px solid var(--card-border);
+    }
+    td {
+      padding: 0.8rem 1.5rem;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.9rem;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafdf9; }
+    .role-badge {
+      font-size: 0.75rem; padding: 0.2rem 0.6rem;
+      border-radius: 20px; font-weight: 600;
+    }
+    .role-landlord { background: #fff3cd; color: #856404; }
+    .role-student { background: var(--green-light); color: var(--green); }
+    .btn-delete {
+      background: none; border: 1px solid var(--red);
+      color: var(--red); border-radius: 6px;
+      padding: 0.3rem 0.8rem; font-size: 0.8rem;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+    .btn-delete:hover { background: var(--red); color: #fff; }
+    .login-wall {
+      max-width: 400px; margin: 5rem auto; text-align: center; padding: 0 1.5rem;
+    }
+    .login-wall h2 { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .login-wall p { color: var(--gray); margin-bottom: 1.5rem; }
+    .login-form input {
+      width: 100%; border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 0.6rem 0.9rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+      outline: none; margin-bottom: 0.8rem;
+    }
+    .login-form input:focus { border-color: var(--dark); }
+    .btn-login {
+      width: 100%; background: var(--dark); color: #fff;
+      border: none; border-radius: 8px; padding: 0.75rem;
+      font-family: 'Syne', sans-serif; font-size: 1rem;
+      font-weight: 700; cursor: pointer;
+    }
+    .alert {
+      padding: 0.7rem 1rem; border-radius: 8px;
+      font-size: 0.88rem; margin-bottom: 1rem; display: none;
+    }
+    .alert-error { background: #f8d7da; color: #721c24; display: block; }
+    .hidden { display: none; }
+    @media (max-width: 768px) {
+      th, td { padding: 0.6rem 0.8rem; }
+      .page-title { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/home" class="nav-logo">Rent<span>A</span>Room <span style="color:#fff;font-weight:300;font-size:0.9rem;">Admin</span></a>
+  <div class="nav-right" id="nav-email"></div>
+</nav>
+
+<!-- LOGIN WALL -->
+<div class="login-wall" id="login-wall">
+  <h2>Admin Access Only</h2>
+  <p>Enter the admin password to continue</p>
+  <div class="alert" id="login-alert"></div>
+  <div class="login-form">
+    <input type="email" id="admin-email" placeholder="Admin email"/>
+    <input type="password" id="admin-password" placeholder="Password"/>
+    <button class="btn-login" onclick="adminLogin()">Login</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page-wrap hidden" id="dashboard">
+  <div class="page-title">Admin Dashboard</div>
+  <div class="page-subtitle">Manage all users and listings on RentARoom Buea</div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Total Users</div>
+      <div class="value" id="stat-users">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Listings</div>
+      <div class="value" id="stat-listings">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Landlords</div>
+      <div class="value" id="stat-landlords">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Students</div>
+      <div class="value" id="stat-students">—</div>
+    </div>
+  </div>
+
+  <!-- USERS TABLE -->
+  <div class="section-card">
+    <div class="section-header">
+      👥 All Users
+      <span id="users-count" style="font-size:0.85rem;color:var(--gray);font-weight:400"></span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="users-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- LISTINGS TABLE -->
+  <div class="section-card">
+    <div class="section-header">
+      🏠 All Listings
+      <span id="listings-count" style="font-size:0.85rem;color:var(--gray);font-weight:400"></span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Neighbourhood</th>
+          <th>Price (FCFA)</th>
+          <th>Owner ID</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="listings-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:8000";
+  const ADMIN_EMAIL = "admin@rentaroom.com";
+  const ADMIN_PASSWORD = "admin2025";
+
+  function adminLogin() {
+    const email = document.getElementById("admin-email").value.trim();
+    const password = document.getElementById("admin-password").value;
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      document.getElementById("login-wall").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+      document.getElementById("nav-email").textContent = email;
+      loadData();
+    } else {
+      const alert = document.getElementById("login-alert");
+      alert.textContent = "Invalid email or password.";
+      alert.className = "alert alert-error";
+    }
+  }
+
+  async function loadData() {
+    const res = await fetch(`${API}/admin/data`);
+    const data = await res.json();
+
+    // Stats
+    document.getElementById("stat-users").textContent = data.users.length;
+    document.getElementById("stat-listings").textContent = data.listings.length;
+    document.getElementById("stat-landlords").textContent = data.users.filter(u => u.role === "landlord").length;
+    document.getElementById("stat-students").textContent = data.users.filter(u => u.role === "student").length;
+    document.getElementById("users-count").textContent = `${data.users.length} total`;
+    document.getElementById("listings-count").textContent = `${data.listings.length} total`;
+
+    // Users table
+    document.getElementById("users-tbody").innerHTML = data.users.map(u => `
+      <tr>
+        <td>${u.id}</td>
+        <td>${u.full_name}</td>
+        <td>${u.email}</td>
+        <td><span class="role-badge role-${u.role}">${u.role}</span></td>
+        <td><button class="btn-delete" onclick="deleteUser(${u.id})">Delete</button></td>
+      </tr>`).join("");
+
+    // Listings table
+    document.getElementById("listings-tbody").innerHTML = data.listings.map(l => `
+      <tr>
+        <td>${l.id}</td>
+        <td>${l.title}</td>
+        <td>${l.neighborhood}</td>
+        <td>${Number(l.price).toLocaleString()}</td>
+        <td>${l.owner_id}</td>
+        <td><button class="btn-delete" onclick="deleteListing(${l.id})">Delete</button></td>
+      </tr>`).join("");
+  }
+
+  async function deleteUser(id) {
+    if (!confirm("Delete this user? This cannot be undone.")) return;
+    await fetch(`${API}/admin/users/${id}`, { method: "DELETE" });
+    loadData();
+  }
+
+  async function deleteListing(id) {
+    if (!confirm("Delete this listing? This cannot be undone.")) return;
+    await fetch(`${API}/admin/listings/${id}`, { method: "DELETE" });
+    loadData();
+  }
+</script>
+</body>
+</html>

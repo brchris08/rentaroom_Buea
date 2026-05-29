@@ -141,6 +141,7 @@
   const API = "https://rentaroom-buea.onrender.com";
   const params = new URLSearchParams(window.location.search);
   const listingId = params.get("id");
+  let listing = null;
 
   function toggleNav() {
     document.getElementById("nav-links").classList.toggle("open");
@@ -185,6 +186,15 @@
     document.querySelectorAll(".photo-thumb").forEach(t => t.classList.remove("active"));
     thumbEl.classList.add("active");
   }
+  function contactLandlord() {
+  const number = listing.whatsapp_number;
+  if (!number) {
+    alert("The landlord has not provided a WhatsApp number.");
+    return;
+  }
+  const cleaned = number.replace(/\D/g, "");
+  window.open(`https://wa.me/${cleaned}`, "_blank");
+  }
 
   async function loadListing() {
     if (!listingId) {
@@ -193,7 +203,7 @@
     }
     try {
       const res = await fetch(`${API}/listings/${listingId}`);
-      const listing = await res.json();
+      listing = await res.json();
 
       if (!listing || listing.detail) {
         document.getElementById("detail-content").innerHTML = `<p style="color:red;padding:2rem">Listing not found.</p>`;
@@ -293,8 +303,10 @@
             </div>
 
             <div class="contact-box">
-              <p>Interested in this room? Contact the landlord directly.</p>
-              <button class="btn-contact" onclick="alert('Contact feature coming soon!')">Contact Landlord</button>
+              <p>Interested in this room? Contact the landlord on WhatsApp.</p>
+              <button class="btn-contact" onclick="contactLandlord()">
+                💬 Chat on WhatsApp
+              </button>
             </div>
           </div>
         </div>`;
