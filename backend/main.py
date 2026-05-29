@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
-from fastapi import FastAPI,UploadFile, File, Depends, HTTPException
+import secrets
+from fastapi import FastAPI,UploadFile, File, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database import engine, Base, get_db
 from backend.routers import auth, listings, predict
@@ -29,12 +30,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-@app.get("/admin")
-def serve_admin():
-    return FileResponse("frontend/templates/admin.html")
+def verify_admin(authorization: str = Header(None)):
+    token = os.getenv("ADMIN_SECRET")
+    if not authorization or authorization != f"Bearer {token}":
+        raise HTTPException(status_code=403, detail="Forbidden")
 
 @app.get("/admin/data")
-def get_admin_data(db: Session = Depends(get_db)):
+def get_admin_data(
+    authorization: str = None,
+    db: Session = Depends(get_db)
+):
+    verify_admin(authorization)
     users = db.query(User).all()
     listings = db.query(Listing).all()
     return {
@@ -43,7 +49,12 @@ def get_admin_data(db: Session = Depends(get_db)):
     }
 
 @app.delete("/admin/users/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(
+    user_id: int,
+    authorization: str = None,
+    db: Session = Depends(get_db)
+):
+    verify_admin(authorization)
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -52,7 +63,56 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     return {"message": "User deleted"}
 
 @app.delete("/admin/listings/{listing_id}")
-def delete_listing(listing_id: int, db: Session = Depends(get_db)):
+def delete_listing(
+    listing_id: int,
+    authorization: str = None,
+    db: Session = Depends(get_db)
+):
+    verify_admin(authorization)
+    listing = db.query(Listing).filter(Listing.id == listing_id).first()
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    db.delete(listing)
+    db.commit()
+    return {"message": "Listing deleted"}
+@app.get("/admin")
+def serve_admin():
+    return FileResponse("frontend/templates/admin.html")
+
+@app.get("/admin/data")
+def get_admin_data(
+    authorization: str = None,
+    db: Session = Depends(get_db)
+):
+    verify_admin(authorization)
+    users = db.query(User).all()
+    listings = db.query(Listing).all()
+    return {
+        "users": [{"id": u.id, "full_name": u.full_name, "email": u.email, "role": u.role} for u in users],
+        "listings": [{"id": l.id, "title": l.title, "neighborhood": l.neighborhood, "price": l.price, "owner_id": l.owner_id} for l in listings]
+    }
+
+@app.delete("/admin/users/{user_id}")
+def delete_user(
+    user_id: int,
+    authorization: str = None,
+    db: Session = Depends(get_db)
+):
+    verify_admin(authorization)
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"message": "User deleted"}
+
+@app.delete("/admin/listings/{listing_id}")
+def delete_listing(
+    listing_id: int,
+    authorization: str = None,
+    db: Session = Depends(get_db)
+):
+    verify_admin(authorization)
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
