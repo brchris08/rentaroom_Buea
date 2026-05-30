@@ -26,6 +26,7 @@ class ListingCreate(BaseModel):
     price: float
     description: Optional[str] = None
     owner_id: int
+    whatsapp_number: Optional[str] = None
     image_urls: Optional[List[str]] = []
 
 class ListingUpdate(BaseModel):
@@ -55,6 +56,7 @@ def serialize_listing(listing):
         "price": listing.price,
         "description": listing.description,
         "owner_id": listing.owner_id,
+        "whatsapp_number": listing.whatsapp_number,
         "image_url": cover,
         "images": images
     }
@@ -63,16 +65,18 @@ def serialize_listing(listing):
 @router.post("/")
 def create_listing(listing: ListingCreate, db: Session = Depends(get_db)):
     new_listing = Listing(
-        title=listing.title,
-        neighborhood=listing.neighborhood,
-        room_type=listing.room_type,
-        water=listing.water,
-        electricity=listing.electricity,
-        wifi=listing.wifi,
-        price=listing.price,
-        description=listing.description,
-        owner_id=listing.owner_id
-    )
+    title=listing.title,
+    neighborhood=listing.neighborhood,
+    room_type=listing.room_type,
+    water=listing.water,
+    electricity=listing.electricity,
+    wifi=listing.wifi,
+    price=listing.price,
+    description=listing.description,
+    owner_id=listing.owner_id,
+    whatsapp_number=listing.whatsapp_number
+)
+    
     db.add(new_listing)
     db.commit()
     db.refresh(new_listing)
