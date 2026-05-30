@@ -26,9 +26,7 @@ app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 # Allow frontend to talk to backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8000",
-                   "http://localhost:8000",
-                   "https://rentaroom-buea.onrender.com"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
