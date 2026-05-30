@@ -269,19 +269,22 @@ async function loadData() {
 }
 
 async function deleteUser(id) {
-  if (!confirm("Delete this user? This cannot be undone.")) return;
-  await fetch(`${API}/admin/users/${id}`, {
-    method: "DELETE",
-    headers: { "Authorization": `Bearer ${adminToken}` }
-  });
-  loadData();
+    if (!confirm("Delete this user? This cannot be undone.")) return;
+    await fetch(`${API}/admin/remove-user/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${adminToken}` }
+    });
+    loadData();
 }
 
 async function deleteListing(id) {
-  if (!confirm("Delete this listing? This cannot be undone.")) return;
-  await fetch(`${API}/admin/listings/${id}`, {
-    method: "DELETE",
-    headers: { "Authorization": `Bearer ${adminToken}` }
+    if (!confirm("Delete this listing? This cannot be undone.")) return;
+    await fetch(`${API}/admin/remove-listing/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${adminToken}` }
+    });
+    loadData();
+}
   });
   loadData();
 }

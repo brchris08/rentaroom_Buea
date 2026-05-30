@@ -26,7 +26,9 @@ app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 # Allow frontend to talk to backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://127.0.0.1:8000",
+                   "http://localhost:8000",
+                   "https://rentaroom-buea.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,22 +64,8 @@ def get_admin_data(
         "listings": [{"id": l.id, "title": l.title, "neighborhood": l.neighborhood, "price": l.price, "owner_id": l.owner_id} for l in listings]
     }
 
-@app.delete("/admin/users/{user_id}")
-def delete_user(
-    user_id: int,
-    db: Session = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    verify_admin(credentials)
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    db.delete(user)
-    db.commit()
-    return {"message": "User deleted"}
-
-@app.delete("/admin/listings/{listing_id}")
-def delete_listing(
+@app.delete("/admin/remove-listing/{listing_id}")
+def admin_delete_listing(
     listing_id: int,
     db: Session = Depends(get_db),
     credentials: HTTPAuthorizationCredentials = Depends(security)
@@ -89,6 +77,20 @@ def delete_listing(
     db.delete(listing)
     db.commit()
     return {"message": "Listing deleted"}
+
+@app.delete("/admin/remove-user/{user_id}")
+def admin_delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    verify_admin(credentials)
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"message": "User deleted"}
 @app.get("/admin")
 def serve_admin(request: Request):
     client_host = request.client.host
