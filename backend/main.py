@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
 load_dotenv()
 import secrets
-from fastapi import FastAPI,UploadFile, File, Depends, HTTPException, Header
+from fastapi import FastAPI,UploadFile, File, Depends, HTTPException, Header, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database import engine, Base, get_db
 from backend.routers import auth, listings, predict
@@ -30,17 +31,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-def verify_admin(authorization: str = Header(None)):
+
+security = HTTPBearer()
+
+def verify_admin(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = os.getenv("ADMIN_SECRET")
-    if not authorization or authorization != f"Bearer {token}":
+    if credentials.credentials != token:
         raise HTTPException(status_code=403, detail="Forbidden")
+    
+@app.post("/admin/login")
+def admin_login(credentials: dict, db: Session = Depends(get_db)):
+    email = credentials.get("email")
+    password = credentials.get("password")
+    if (email == os.getenv("ADMIN_EMAIL") and
+        password == os.getenv("ADMIN_PASSWORD")):
+        token = os.getenv("ADMIN_SECRET")
+        return {"token": token}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
 @app.get("/admin/data")
 def get_admin_data(
-    authorization: str = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    verify_admin(authorization)
+    verify_admin(credentials)
     users = db.query(User).all()
     listings = db.query(Listing).all()
     return {
@@ -51,10 +65,10 @@ def get_admin_data(
 @app.delete("/admin/users/{user_id}")
 def delete_user(
     user_id: int,
-    authorization: str = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    verify_admin(authorization)
+    verify_admin(credentials)
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -65,10 +79,10 @@ def delete_user(
 @app.delete("/admin/listings/{listing_id}")
 def delete_listing(
     listing_id: int,
-    authorization: str = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    verify_admin(authorization)
+    verify_admin(credentials)
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
@@ -76,7 +90,11 @@ def delete_listing(
     db.commit()
     return {"message": "Listing deleted"}
 @app.get("/admin")
-def serve_admin():
+def serve_admin(request: Request):
+    client_host = request.client.host
+    allowed = ["127.0.0.1", "::1", "localhost"]
+    if client_host not in allowed:
+        raise HTTPException(status_code=404, detail="Not found")
     return FileResponse("frontend/templates/admin.html")
 
 @app.get("/admin/data")
