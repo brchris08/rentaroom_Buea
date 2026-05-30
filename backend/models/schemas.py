@@ -29,6 +29,7 @@ class Listing(Base):
     wifi = Column(Boolean, nullable=False)
     price = Column(Integer, nullable=False)
     description = Column(String, nullable=True)
+    whatsapp_number = Column(String, nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     owner = relationship("User", back_populates="listings")
@@ -42,7 +43,6 @@ class ListingImage(Base):
     id = Column(Integer, primary_key=True, index=True)
     listing_id = Column(Integer, ForeignKey("listings.id"), nullable=False)
     image_url = Column(String, nullable=False)
-    whatsapp_number = Column(String, nullable=True)
     is_cover = Column(Boolean, default=False)
 
     listing = relationship("Listing", back_populates="images")
