@@ -158,7 +158,7 @@
     authLink.href = "/login";
   }
 
-  if (user.role === "student") {
+if (user && user.role === "student") {
   const postBtn = document.getElementById("btn-post-listing");
   if (postBtn) postBtn.style.display = "none";
 }
