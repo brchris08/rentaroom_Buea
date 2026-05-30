@@ -194,100 +194,97 @@
 </div>
 
 <script>
-const API = "https://rentaroom-buea.onrender.com";
-let adminToken = sessionStorage.getItem("admin_token") || null;
+  const API = "https://rentaroom-buea.onrender.com";
+  let adminToken = sessionStorage.getItem("admin_token") || null;
 
-if (adminToken) {
-  document.getElementById("login-wall").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
-  loadData();
-}
-
-async function adminLogin() {
-  const email = document.getElementById("admin-email").value.trim();
-  const password = document.getElementById("admin-password").value;
-
-  const res = await fetch(`${API}/admin/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
-
-  if (res.ok) {
-    const data = await res.json();
-    adminToken = data.token;
-    sessionStorage.setItem("admin_token", adminToken);
+  if (adminToken) {
     document.getElementById("login-wall").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
-    document.getElementById("nav-email").textContent = email;
     loadData();
-  } else {
-    const alert = document.getElementById("login-alert");
-    alert.textContent = "Invalid email or password.";
-    alert.className = "alert alert-error";
-  }
-}
-
-async function loadData() {
-  const res = await fetch(`${API}/admin/data`, {
-    headers: { "Authorization": `Bearer ${adminToken}` }
-  });
-
-  if (res.status === 403) {
-    sessionStorage.removeItem("admin_token");
-    location.reload();
-    return;
   }
 
-  const data = await res.json();
+  async function adminLogin() {
+    const email = document.getElementById("admin-email").value.trim();
+    const password = document.getElementById("admin-password").value;
 
-  document.getElementById("stat-users").textContent = data.users.length;
-  document.getElementById("stat-listings").textContent = data.listings.length;
-  document.getElementById("stat-landlords").textContent = data.users.filter(u => u.role === "landlord").length;
-  document.getElementById("stat-students").textContent = data.users.filter(u => u.role === "student").length;
-  document.getElementById("users-count").textContent = `${data.users.length} total`;
-  document.getElementById("listings-count").textContent = `${data.listings.length} total`;
+    const res = await fetch(`${API}/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
 
-  document.getElementById("users-tbody").innerHTML = data.users.map(u => `
-    <tr>
-      <td>${u.id}</td>
-      <td>${u.full_name}</td>
-      <td>${u.email}</td>
-      <td><span class="role-badge role-${u.role}">${u.role}</span></td>
-      <td><button class="btn-delete" onclick="deleteUser(${u.id})">Delete</button></td>
-    </tr>`).join("");
+    if (res.ok) {
+      const data = await res.json();
+      adminToken = data.token;
+      sessionStorage.setItem("admin_token", adminToken);
+      document.getElementById("login-wall").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+      document.getElementById("nav-email").textContent = email;
+      loadData();
+    } else {
+      const alertEl = document.getElementById("login-alert");
+      alertEl.textContent = "Invalid email or password.";
+      alertEl.className = "alert alert-error";
+    }
+  }
 
-  document.getElementById("listings-tbody").innerHTML = data.listings.map(l => `
-    <tr>
-      <td>${l.id}</td>
-      <td>${l.title}</td>
-      <td>${l.neighborhood}</td>
-      <td>${Number(l.price).toLocaleString()}</td>
-      <td>${l.owner_id}</td>
-      <td><button class="btn-delete" onclick="deleteListing(${l.id})">Delete</button></td>
-    </tr>`).join("");
-}
+  async function loadData() {
+    const res = await fetch(`${API}/admin/data`, {
+      headers: { "Authorization": `Bearer ${adminToken}` }
+    });
 
-async function deleteUser(id) {
+    if (res.status === 403) {
+      sessionStorage.removeItem("admin_token");
+      location.reload();
+      return;
+    }
+
+    const data = await res.json();
+
+    document.getElementById("stat-users").textContent = data.users.length;
+    document.getElementById("stat-listings").textContent = data.listings.length;
+    document.getElementById("stat-landlords").textContent = data.users.filter(u => u.role === "landlord").length;
+    document.getElementById("stat-students").textContent = data.users.filter(u => u.role === "student").length;
+    document.getElementById("users-count").textContent = `${data.users.length} total`;
+    document.getElementById("listings-count").textContent = `${data.listings.length} total`;
+
+    document.getElementById("users-tbody").innerHTML = data.users.map(u => `
+      <tr>
+        <td>${u.id}</td>
+        <td>${u.full_name}</td>
+        <td>${u.email}</td>
+        <td><span class="role-badge role-${u.role}">${u.role}</span></td>
+        <td><button class="btn-delete" onclick="deleteUser(${u.id})">Delete</button></td>
+      </tr>`).join("");
+
+    document.getElementById("listings-tbody").innerHTML = data.listings.map(l => `
+      <tr>
+        <td>${l.id}</td>
+        <td>${l.title}</td>
+        <td>${l.neighborhood}</td>
+        <td>${Number(l.price).toLocaleString()}</td>
+        <td>${l.owner_id}</td>
+        <td><button class="btn-delete" onclick="deleteListing(${l.id})">Delete</button></td>
+      </tr>`).join("");
+  }
+
+  async function deleteUser(id) {
     if (!confirm("Delete this user? This cannot be undone.")) return;
     await fetch(`${API}/admin/remove-user/${id}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${adminToken}` }
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${adminToken}` }
     });
     loadData();
-}
+  }
 
-async function deleteListing(id) {
+  async function deleteListing(id) {
     if (!confirm("Delete this listing? This cannot be undone.")) return;
     await fetch(`${API}/admin/remove-listing/${id}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${adminToken}` }
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${adminToken}` }
     });
     loadData();
-}
-  });
-  loadData();
-}
+  }
 </script>
 </body>
 </html>
