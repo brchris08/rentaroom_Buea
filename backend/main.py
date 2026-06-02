@@ -123,6 +123,10 @@ def serve_login():
 def serve_post_listing():
     return FileResponse("frontend/templates/post-listing.html")
 
+@app.get("/my-listings")
+def serve_my_listings():
+    return FileResponse("frontend/templates/my-listings.html")
+
 @app.get("/listing-detail")
 def serve_listing_detail():
     return FileResponse("frontend/templates/listing-detail.html")

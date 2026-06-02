@@ -599,9 +599,15 @@ if (user) {
     localStorage.removeItem("user");
     location.reload();
   };
-  if (user.role === "student") {
-    const postBtn = document.getElementById("btn-post-listing");
-    if (postBtn) postBtn.style.display = "none";
+  if (user.role === "landlord") {
+    const myListingsLink = document.createElement("a");
+    myListingsLink.href = "/my-listings";
+    myListingsLink.textContent = "My Listings";
+    myListingsLink.style.color = "#fff";
+    document.getElementById("nav-links").insertBefore(
+      myListingsLink,
+      document.getElementById("nav-auth-link")
+    );
   }
 }
 

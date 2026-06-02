@@ -38,6 +38,7 @@ class ListingUpdate(BaseModel):
     wifi: Optional[bool] = None
     price: Optional[float] = None
     description: Optional[str] = None
+    whatsapp_number: Optional[str] = None
 
 # --- Helper to serialize listing ---
 def serialize_listing(listing):
@@ -111,6 +112,11 @@ def get_all_listings(
     if max_price:
         query = query.filter(Listing.price <= max_price)
     return [serialize_listing(l) for l in query.all()]
+
+@router.get("/owner/{owner_id}")
+def get_listings_by_owner(owner_id: int, db: Session = Depends(get_db)):
+    listings = db.query(Listing).filter(Listing.owner_id == owner_id).all()
+    return [serialize_listing(l) for l in listings]
 
 @router.get("/{listing_id}")
 def get_listing(listing_id: int, db: Session = Depends(get_db)):
